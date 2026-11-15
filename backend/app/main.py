@@ -1,11 +1,11 @@
 from fastapi import FastAPI
-
+from .auth import router as auth_router
 app = FastAPI(
     title="He thong dat lich kham",
     description="DG2 - De tai 6 - Phong kham tu nhan",
     version="1.0.0"
 )
-
+app.include_router(auth_router)
 @app.get("/")
 def home():
     return {
