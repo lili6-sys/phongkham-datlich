@@ -1,3 +1,4 @@
+from .auth import require_roles, get_current_user
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -34,7 +35,9 @@ class AppointmentResponse(BaseModel):
 
 
 # 1. Lay danh sach lich hen
-@router.get("/", response_model=list[AppointmentResponse])
+@router.get("/", response_model=list[AppointmentResponse],
+    dependencies=[Depends(require_roles('admin'))]
+)
 def get_appointments(db: Session = Depends(get_db)):
     return db.scalars(
         select(Appointment).order_by(Appointment.id)
@@ -45,7 +48,8 @@ def get_appointments(db: Session = Depends(get_db)):
 @router.get("/{appointment_id}", response_model=AppointmentResponse)
 def get_appointment(
     appointment_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user)
 ):
     appointment = db.get(Appointment, appointment_id)
 
@@ -54,6 +58,11 @@ def get_appointment(
             status_code=404,
             detail="Khong tim thay lich hen"
         )
+
+    if current_user["role"] != "admin" and (
+        appointment.patient_username != current_user["username"]
+    ):
+        raise HTTPException(403, "Khong co quyen truy cap lich hen")
 
     return appointment
 
@@ -66,8 +75,15 @@ def get_appointment(
 )
 def create_appointment(
     data: AppointmentCreate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user)
 ):
+    if current_user["role"] != "admin" and (
+        current_user["role"] != "patient"
+        or data.patient_username.strip() != current_user["username"]
+    ):
+        raise HTTPException(403, "Chi duoc dat lich cho chinh minh")
+
     doctor = db.get(Doctor, data.doctor_id)
 
     if not doctor or not doctor.is_active:
@@ -129,7 +145,8 @@ def create_appointment(
 )
 def cancel_appointment(
     appointment_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user)
 ):
     appointment = db.get(Appointment, appointment_id)
 
@@ -138,6 +155,11 @@ def cancel_appointment(
             status_code=404,
             detail="Khong tim thay lich hen"
         )
+
+    if current_user["role"] != "admin" and (
+        appointment.patient_username != current_user["username"]
+    ):
+        raise HTTPException(403, "Khong co quyen truy cap lich hen")
 
     if appointment.status not in ["pending", "confirmed"]:
         raise HTTPException(
@@ -164,7 +186,8 @@ class AppointmentReschedule(BaseModel):
 def reschedule_appointment(
     appointment_id: int,
     data: AppointmentReschedule,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user)
 ):
     appointment = db.get(Appointment, appointment_id)
 
@@ -173,6 +196,11 @@ def reschedule_appointment(
             status_code=404,
             detail="Khong tim thay lich hen"
         )
+
+    if current_user["role"] != "admin" and (
+        appointment.patient_username != current_user["username"]
+    ):
+        raise HTTPException(403, "Khong co quyen truy cap lich hen")
 
     if appointment.status not in ["pending", "confirmed"]:
         raise HTTPException(
@@ -224,6 +252,8 @@ def reschedule_appointment(
 @router.patch(
     "/{appointment_id}/confirm",
     response_model=AppointmentResponse
+,
+    dependencies=[Depends(require_roles('admin'))]
 )
 def confirm_appointment(
     appointment_id: int,
@@ -253,6 +283,8 @@ def confirm_appointment(
 @router.patch(
     "/{appointment_id}/check-in",
     response_model=AppointmentResponse
+,
+    dependencies=[Depends(require_roles('admin'))]
 )
 def check_in_appointment(
     appointment_id: int,

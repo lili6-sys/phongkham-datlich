@@ -1,3 +1,4 @@
+from .auth import require_roles
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import select
@@ -57,7 +58,9 @@ def get_doctor(
 
 
 # 3. Them bac si
-@router.post("/", response_model=DoctorResponse, status_code=201)
+@router.post("/", response_model=DoctorResponse, status_code=201,
+    dependencies=[Depends(require_roles('admin'))]
+)
 def create_doctor(
     data: DoctorCreate,
     db: Session = Depends(get_db)
@@ -85,7 +88,9 @@ def create_doctor(
 
 
 # 4. Cap nhat bac si
-@router.put("/{doctor_id}", response_model=DoctorResponse)
+@router.put("/{doctor_id}", response_model=DoctorResponse,
+    dependencies=[Depends(require_roles('admin'))]
+)
 def update_doctor(
     doctor_id: int,
     data: DoctorCreate,
@@ -119,7 +124,9 @@ def update_doctor(
 
 
 # 5. Xoa bac si
-@router.delete("/{doctor_id}")
+@router.delete("/{doctor_id}",
+    dependencies=[Depends(require_roles('admin'))]
+)
 def delete_doctor(
     doctor_id: int,
     db: Session = Depends(get_db)

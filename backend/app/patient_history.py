@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from .auth import get_current_user
 from .database import get_db
 from .models import Appointment, MedicalRecord, Invoice
 
@@ -18,7 +19,8 @@ router = APIRouter(
 @router.get("/{patient_username}")
 def get_patient_history(
     patient_username: str,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user)
 ):
     # Chi bat API demo khi duoc cho phep
     if os.getenv("ENABLE_DEMO_HISTORY") != "1":
@@ -34,6 +36,11 @@ def get_patient_history(
             status_code=422,
             detail="Ten benh nhan khong hop le"
         )
+
+    if current_user["role"] != "admin" and (
+        username != current_user["username"]
+    ):
+        raise HTTPException(403, "Khong co quyen xem lich su nay")
 
     appointments = db.scalars(
         select(Appointment)

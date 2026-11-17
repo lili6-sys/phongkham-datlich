@@ -1,3 +1,4 @@
+from .auth import require_roles
 from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -33,7 +34,9 @@ class MedicalRecordResponse(BaseModel):
 
 
 # 1. Lay danh sach ket qua kham
-@router.get("/", response_model=list[MedicalRecordResponse])
+@router.get("/", response_model=list[MedicalRecordResponse],
+    dependencies=[Depends(require_roles('admin'))]
+)
 def get_medical_records(db: Session = Depends(get_db)):
     return db.scalars(
         select(MedicalRecord).order_by(MedicalRecord.id)
@@ -41,7 +44,9 @@ def get_medical_records(db: Session = Depends(get_db)):
 
 
 # 2. Xem chi tiet ket qua kham
-@router.get("/{record_id}", response_model=MedicalRecordResponse)
+@router.get("/{record_id}", response_model=MedicalRecordResponse,
+    dependencies=[Depends(require_roles('admin'))]
+)
 def get_medical_record(
     record_id: int,
     db: Session = Depends(get_db)
@@ -62,6 +67,8 @@ def get_medical_record(
     "/",
     response_model=MedicalRecordResponse,
     status_code=201
+,
+    dependencies=[Depends(require_roles('admin'))]
 )
 def create_medical_record(
     data: MedicalRecordCreate,

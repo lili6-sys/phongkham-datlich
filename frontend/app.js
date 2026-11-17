@@ -78,6 +78,10 @@ function showPage(pageId) {
 
     if (pageId === "booking") {
         loadDoctorOptions();
+        if (currentUser && currentUser.role === "patient") {
+            document.getElementById("patientUsername").value =
+                currentUser.username;
+        }
     }
 }
 
@@ -172,6 +176,11 @@ document.getElementById("bookingForm")
         ).value;
 
         const note = document.getElementById("note").value.trim();
+
+        if (!currentUser) {
+            message.textContent = "Hay dang nhap truoc khi dat lich.";
+            return;
+        }
 
         if (!username || !doctorId || !localTime) {
             message.textContent = "Vui long nhap day du thong tin.";

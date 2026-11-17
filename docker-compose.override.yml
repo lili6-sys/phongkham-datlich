@@ -24,6 +24,7 @@ services:
       DB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD required}
       JWT_SECRET_KEY: ${JWT_SECRET_KEY:?JWT_SECRET_KEY required}
       ENABLE_DEMO_ADMIN: "1"
+      ENABLE_DEMO_HISTORY: "1"
       DEMO_ADMIN_PASSWORD: ${DEMO_ADMIN_PASSWORD:?DEMO_ADMIN_PASSWORD required}
     depends_on:
       db:
