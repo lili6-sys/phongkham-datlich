@@ -1,0 +1,134 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ thống đặt lịch khám</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="app.js" defer></script>
+</head>
+<body>
+
+    <header class="header">
+        <div class="container">
+            <h1>🏥 Phòng Khám Tư Nhân</h1>
+            <p>Hệ thống quản lý và đặt lịch khám bệnh</p>
+        </div>
+    </header>
+
+    <nav class="navbar">
+        <button data-page="home">Trang chủ</button>
+        <button data-page="doctors">Bác sĩ</button>
+        <button data-page="booking">Đặt lịch</button>
+        <button data-page="management">Quản lý</button>
+        <button data-page="login">Đăng nhập</button>
+    </nav>
+
+    <main class="container">
+
+        <section id="home" class="page">
+            <h2>Chào mừng đến với phòng khám</h2>
+            <p>Đặt lịch khám nhanh chóng và thuận tiện.</p>
+
+            <div class="features">
+                <div class="card">
+                    <h3>👨‍⚕️ Đội ngũ bác sĩ</h3>
+                    <p>Xem danh sách bác sĩ và chuyên khoa.</p>
+                </div>
+
+                <div class="card">
+                    <h3>📅 Đặt lịch khám</h3>
+                    <p>Chọn bác sĩ và thời gian khám phù hợp.</p>
+                </div>
+
+                <div class="card">
+                    <h3>📋 Quản lý lịch hẹn</h3>
+                    <p>Theo dõi trạng thái lịch khám.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="doctors" class="page" hidden>
+            <h2>Danh sách bác sĩ</h2>
+            <button id="loadDoctors">Tải danh sách bác sĩ</button>
+            <div id="doctorList"></div>
+        </section>
+
+        <section id="booking" class="page" hidden>
+            <h2>Đặt lịch khám bệnh</h2>
+
+            <form id="bookingForm">
+                <label for="patientUsername">Tên đăng nhập bệnh nhân</label>
+                <input
+                    type="text"
+                    id="patientUsername"
+                    required
+                >
+
+                <label for="doctorId">Bác sĩ</label>
+                <select id="doctorId" required>
+                    <option value="">-- Chọn bác sĩ --</option>
+                </select>
+
+                <label for="appointmentTime">Ngày và giờ khám</label>
+                <input
+                    type="datetime-local"
+                    id="appointmentTime"
+                    required
+                >
+
+                <label for="note">Ghi chú</label>
+                <textarea id="note" rows="3"></textarea>
+
+                <button type="submit">Đặt lịch khám</button>
+            </form>
+
+            <p id="bookingMessage" role="status"></p>
+        </section>
+
+        <section id="management" class="page" hidden>
+            <h2>Quản lý lịch hẹn</h2>
+
+            <button id="loadAppointments">
+                Xem danh sách lịch hẹn
+            </button>
+
+            <div id="appointmentList"></div>
+        </section>
+
+        <section id="login" class="page" hidden>
+            <h2>Đăng nhập hệ thống</h2>
+
+            <form id="loginForm">
+                <label for="username">Tên đăng nhập</label>
+                <input
+                    type="text"
+                    id="username"
+                    required
+                >
+
+                <label for="password">Mật khẩu</label>
+                <input
+                    type="password"
+                    id="password"
+                    required
+                >
+
+                <button type="submit">Đăng nhập</button>
+            </form>
+
+            <p id="loginMessage" role="status"></p>
+        </section>
+
+    </main>
+
+    <footer class="footer">
+        <p>
+            Đề tài 6 - Hệ thống đặt lịch khám tại phòng khám tư nhân
+        </p>
+        <p>Frontend & Testing - Phạm Như Quỳnh</p>
+    </footer>
+
+</body>
+</html>
