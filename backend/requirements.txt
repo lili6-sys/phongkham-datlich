@@ -1,2 +1,4 @@
 fastapi
 uvicorn[standard]
+SQLAlchemy>=2.0,<3
+psycopg[binary]>=3,<4
