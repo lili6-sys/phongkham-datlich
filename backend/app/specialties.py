@@ -1,3 +1,4 @@
+from .auth import require_roles
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import select
@@ -53,7 +54,9 @@ def get_specialty(
 
 
 # 3. Them chuyen khoa
-@router.post("/", response_model=SpecialtyResponse, status_code=201)
+@router.post("/", response_model=SpecialtyResponse, status_code=201,
+    dependencies=[Depends(require_roles('admin'))]
+)
 def create_specialty(
     data: SpecialtyCreate,
     db: Session = Depends(get_db)
@@ -87,7 +90,9 @@ def create_specialty(
 
 
 # 4. Cap nhat chuyen khoa
-@router.put("/{specialty_id}", response_model=SpecialtyResponse)
+@router.put("/{specialty_id}", response_model=SpecialtyResponse,
+    dependencies=[Depends(require_roles('admin'))]
+)
 def update_specialty(
     specialty_id: int,
     data: SpecialtyCreate,
@@ -126,7 +131,9 @@ def update_specialty(
 
 
 # 5. Xoa chuyen khoa
-@router.delete("/{specialty_id}")
+@router.delete("/{specialty_id}",
+    dependencies=[Depends(require_roles('admin'))]
+)
 def delete_specialty(
     specialty_id: int,
     db: Session = Depends(get_db)

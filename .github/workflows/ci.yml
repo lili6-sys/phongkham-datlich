@@ -1,0 +1,47 @@
+
+name: Backend CI
+
+on:
+  push:
+    branches: [main, feat/auth, feat/devops]
+  pull_request:
+    branches: [main, feat/auth]
+
+permissions:
+  contents: read
+
+env:
+  DB_PASSWORD: ci_test_password_only
+  JWT_SECRET_KEY: ci_test_jwt_key_only
+  DEMO_ADMIN_PASSWORD: ci_test_admin_password
+
+jobs:
+  backend-ci:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v7
+
+      - name: Setup Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install -r backend/requirements.txt
+
+      - name: Check Python code
+        working-directory: backend
+        run: |
+          python -m compileall -q app
+          python -c "from app.main import app; print('Import OK')"
+
+      - name: Build Docker Image
+        run: |
+          docker build -t phongkham-backend:ci ./backend
+
+      - name: Validate Docker Compose
+        run: |
+          docker compose config -q

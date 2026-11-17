@@ -1,3 +1,4 @@
+from .auth import require_roles
 from datetime import datetime
 from decimal import Decimal
 
@@ -35,7 +36,9 @@ class InvoiceResponse(BaseModel):
 
 
 # 1. Lay danh sach hoa don
-@router.get("/", response_model=list[InvoiceResponse])
+@router.get("/", response_model=list[InvoiceResponse],
+    dependencies=[Depends(require_roles('admin'))]
+)
 def get_invoices(db: Session = Depends(get_db)):
     return db.scalars(
         select(Invoice).order_by(Invoice.id)
@@ -43,7 +46,9 @@ def get_invoices(db: Session = Depends(get_db)):
 
 
 # 2. Xem chi tiet hoa don
-@router.get("/{invoice_id}", response_model=InvoiceResponse)
+@router.get("/{invoice_id}", response_model=InvoiceResponse,
+    dependencies=[Depends(require_roles('admin'))]
+)
 def get_invoice(
     invoice_id: int,
     db: Session = Depends(get_db)
@@ -64,6 +69,8 @@ def get_invoice(
     "/",
     response_model=InvoiceResponse,
     status_code=201
+,
+    dependencies=[Depends(require_roles('admin'))]
 )
 def create_invoice(
     data: InvoiceCreate,
@@ -120,6 +127,8 @@ def create_invoice(
 @router.patch(
     "/{invoice_id}/pay",
     response_model=InvoiceResponse
+,
+    dependencies=[Depends(require_roles('admin'))]
 )
 def pay_invoice(
     invoice_id: int,
